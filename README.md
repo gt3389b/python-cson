@@ -6,7 +6,7 @@ Python library for CSON (schema-compressed JSON)
 
 Authors
 -------
-*  Russell Leake, gt3389b@gmail.com
+*  Russell Leake, http://www.leakerlabs.com/, gt3389b@gmail.com
 
 Source
 ------
