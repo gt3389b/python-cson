@@ -5,6 +5,7 @@
 # cson (schema-compessed json)
 #
 # author: Russell Leake, http://leakerlabs.com, gt3389b@gmail.com
+# note: based on CSON-js by JongChan Choi, https://github.com/disjukr/CSON-js
 import json
 
 __all__ = ("loads", )
@@ -180,9 +181,7 @@ def tokenize(text):
             buffer += currentChar
             if (not isName(nextChar)): 
                break
-         #buffer = buffer.encode('utf16','ignore')
          tokens.append("".join(buffer))
-         #print tokens[-1:][0].decode('utf16','ignore')
    return tokens
 
 def toJSON(text, indent=0):
