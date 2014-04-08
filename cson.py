@@ -264,7 +264,7 @@ def toJSON(text, indent=0):
 
    return ''.join(tokens)
 
-def cson2json(csonString):
-   return toJSON(csonString)
+def cson2json(csonString,indent=0):
+   return toJSON(csonString,indent)
 
 loads = cson2json
