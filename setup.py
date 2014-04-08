@@ -3,6 +3,13 @@
 
 from setuptools import setup, find_packages
 
+def read_readme(fname):
+   try:
+      import pypandoc
+      return pypandoc.convert('README.md','rst')
+   except (IOError, ImportError):
+      return ''
+
 setup(
     name = "python-cson",
     version = "1.0.1",
@@ -13,6 +20,8 @@ setup(
     author = 'Russell Leake',
     author_email = 'gt3389b@gmail.com',
     py_modules = ["cson"],
+    long_description = read_readme('README.md'),
     include_package_data = True,
     zip_safe = False,
+    keywords = 'json cson cursive'
 )
