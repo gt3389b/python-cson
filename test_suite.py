@@ -23,7 +23,7 @@ def parseTest(input, expected, message=""):
 def printSubject(subject):
     print ''
     print '*****'
-    print '\x1B[33m ' + subject + '\x1B[39m'
+    print '\x1B[33m' + subject + '\x1B[39m'
     print '*****'
 
 
@@ -67,7 +67,8 @@ parseTest('{"a": 0}', json.loads('{"a": 0}'));
 parseTest('{\'b\': true}', json.loads('{"b": true}'));
 parseTest('{c: null}', json.loads('{"c": null}'));
 parseTest('d: "string"', json.loads('{"d": "string"}'));
-parseTest('e = []', json.loads('{"e": []}'));
+parseTest('d:  string', json.loads('{"d": "string"}'), 'ensure unquoted values get quoted');
+parseTest('e = []', json.loads('{"e": []}'), 'ensure unquoted keys get quoted');
 
 
 printSubject('Complex');

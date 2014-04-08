@@ -56,6 +56,28 @@ def stringToLiteral(string):
    string = string.replace('\"', '\\\"');
    return string;
 
+def isNumber(s):
+   """ Checks to see if this is a JSON number """
+   try:
+      float(s)
+      return True
+   except ValueError:
+      return False
+
+def isBoolean(s):
+   """ Checks to see if this is a JSON bool """
+   if (s == 'true') | (s == 'false'):
+      return True
+   else:
+      return False
+
+def isNull(s):
+   """ Checks to see if this is a JSON null object """
+   if (s == 'null'):
+      return True
+   else:
+      return False
+
 def get_iterable(text):
      if type(text) == list:
         iterable = range(len(text))
@@ -183,7 +205,11 @@ def tokenize(text):
    return tokens
 
 def toJSON(text, indent=0):
+   """ Convert 'text' from cson to a json string """
+
+   # first tokenize the string
    tokens = tokenize(text);
+
    indentLevel = 0;
    if (indent != '0'):
       if isinstance(indent, int):
@@ -214,10 +240,13 @@ def toJSON(text, indent=0):
    while(i < len(tokens)):
       token = tokens[i];
 
+      prevToken = nextToken = None;
+
       if ( i < len(tokens) - 1):
          nextToken = tokens[i + 1];
-      else:
-         nextToken = None;
+
+      if ( i > 0 ):
+         prevToken = tokens[i - 1]
 
       if indent:
          if (token == ':'):
@@ -227,8 +256,21 @@ def toJSON(text, indent=0):
          if (isEndOfBracket(token[0])):
             indentLevel-=1;
 
+      # if a key_name needs to be quoted, then add quotes
       if (isName(token[0]) & (nextToken == ':')):
          tokens[i] = '\"' + tokens[i] + '\"';
+
+      # if a value_name needs to be quoted, then add quotes
+      elif (isName(token[0]) & (':' == (prevToken[0] if prevToken != None else None))):
+         # make sure we don't quote native JSON values like numbers, bools, and nulls
+         if isNumber(tokens[i]):
+            pass
+         elif isBoolean(tokens[i]):
+            pass
+         elif isNull(tokens[i]):
+            pass
+         else:
+            tokens[i] = '\"' + tokens[i] + '\"';
 
       if nextToken:
          if not (isNameSeparator(token[0]) | isNameSeparator(nextToken[0]) | isBeginOfBracket(token[0]) | isEndOfBracket(nextToken[0])):
@@ -245,6 +287,7 @@ def toJSON(text, indent=0):
             prevToken = tokens[i - 1];
          else:
             prevToken = None
+
          if i < len(tokens)-1:
             nextToken = tokens[i + 1];
          else:
@@ -255,6 +298,7 @@ def toJSON(text, indent=0):
             if nextToken:
                if not isEndOfBracket(nextToken[0]):
                   tokens[i] += newline();
+
          if isEndOfBracket(token[0]):
             indentLevel-=1;
             if prevToken:
