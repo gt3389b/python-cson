@@ -6,8 +6,6 @@
 #
 # author: Russell Leake, http://leakerlabs.com, gt3389b@gmail.com
 # note: based on CSON-js by JongChan Choi, https://github.com/disjukr/CSON-js
-import json
-
 __all__ = ("loads", )
 
 def isName(char):
@@ -267,6 +265,6 @@ def toJSON(text, indent=0):
    return ''.join(tokens)
 
 def cson2json(csonString):
-   return json.loads(toJSON(csonString))
+   return toJSON(csonString)
 
 loads = cson2json
