@@ -6,6 +6,7 @@
 #
 # author: Russell Leake, http://leakerlabs.com, gt3389b@gmail.com
 # note: based on CSON-js by JongChan Choi, https://github.com/disjukr/CSON-js
+import sys,optparse
 __all__ = ("loads", )
 
 def isName(char):
@@ -312,3 +313,43 @@ def cson2json(csonString,indent=0):
    return toJSON(csonString,indent)
 
 loads = cson2json
+
+if __name__ == "__main__":
+   """
+   Define and parse `optparse` options for command-line usage.
+   """
+   usage = """%prog [options] [INPUTFILE]
+      (STDIN is assumed if no INPUTFILE is given)"""
+   desc = "A Python implementation of John Gruber's Markdown. " \
+         "http://packages.python.org/Markdown/"
+   ver = "%%prog %s" % "1.0.4"
+
+   parser = optparse.OptionParser(usage=usage, description=desc, version=ver)
+   parser.add_option("-f", "--file", dest="filename", default=None,
+         help="Write output to OUTPUT_FILE. Defaults to STDOUT.",
+         metavar="OUTPUT_FILE")
+   parser.add_option("-v", "--verbose",
+         action="store_const", const=0, dest="verbose",
+         help="Print all warnings.")
+
+   (options, args) = parser.parse_args()
+
+   if len(args) == 0:
+      input_file = None
+   else:
+      input_file = args[0]
+
+   cson_data=''
+   if input_file:
+      with open (input_file, "r") as infile:
+         cson_data=infile.readlines()
+   else:
+      for line in sys.stdin:
+         cson_data+=line
+
+   json_data=loads(''.join(cson_data))
+   if options.filename:
+      with open (options.filename, "w") as outfile:
+         outfile.write(json_data)
+   else:
+      print json_data

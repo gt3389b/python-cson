@@ -12,7 +12,7 @@ def read_readme(fname):
 
 setup(
     name = "python-cson",
-    version = "1.0.5",
+    version = "1.0.6",
     url = 'https://github.com/lifthrasiir/cson',
     download_url = 'https://github.com/gt3389b/python-cson/',
     license = 'MIT',
