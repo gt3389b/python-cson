@@ -64,8 +64,10 @@ printSubject('Object');
 
 parseTest('{}', {}, 'object');
 parseTest('{"a": 0}', json.loads('{"a": 0}'));
-parseTest('{\'b\': true}', json.loads('{"b": true}'));
-parseTest('{c: null}', json.loads('{"c": null}'));
+parseTest('{\'b\': true}', json.loads('{"b": true}'), 'ensure unquoted bool does not get quoted');
+parseTest('{"b": True}', json.loads('{"b": "True"}'));
+parseTest('{c: null}', json.loads('{"c": null}'), 'ensure unquoted null does not get quoted');
+parseTest('{c: Null}', json.loads('{"c": "Null"}'));
 parseTest('d: "string"', json.loads('{"d": "string"}'));
 parseTest('d:  string', json.loads('{"d": "string"}'), 'ensure unquoted values get quoted');
 parseTest('e = []', json.loads('{"e": []}'), 'ensure unquoted keys get quoted');
