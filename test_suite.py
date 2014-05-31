@@ -13,8 +13,7 @@ def parseTest(input, expected, message=""):
     if len(message):
       print ""
       print '\x1B[1m\x1B[33m' + message + '\x1B[22m'
-    json_string=cson.loads(input, 1)
-    actual = json.loads(json_string)
+    actual = cson.loads(input)
     if not compare(expected,actual):
        print '\x1B[1m\x1B[31mFAILED\x1B[39m\x1B[22m', ': expected(', expected, ") actual(", actual,")"
        assert(0)

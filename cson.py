@@ -6,7 +6,7 @@
 #
 # author: Russell Leake, http://leakerlabs.com, gt3389b@gmail.com
 # note: based on CSON-js by JongChan Choi, https://github.com/disjukr/CSON-js
-import sys,optparse
+import sys,optparse, json
 __all__ = ("loads", )
 
 def isName(char):
@@ -317,7 +317,7 @@ def csons2py(csonString):
 
 def cson2py(filename):
    with open (filename, "r") as infile:
-      return json.loads(toJSON(infile.readlines()))
+      return csons2py(''.join(infile.readlines()))
 
 loads = csons2py
 load = cson2py
@@ -347,17 +347,18 @@ if __name__ == "__main__":
    else:
       input_file = None
 
-   cson_data=''
-   if input_file:
-      with open (input_file, "r") as infile:
-         cson_data=infile.readlines()
-   else:
-      for line in sys.stdin:
-         cson_data+=line
+   #cson_data=''
+   #if input_file:
+   #   with open (input_file, "r") as infile:
+   #      cson_data=infile.readlines()
+   #else:
+   #   for line in sys.stdin:
+   #      cson_data+=line
 
-   json_data=csons2json(''.join(cson_data))
+   #json_data=csons2json(''.join(cson_data))
+   data=load(input_file)
    if options.filename:
       with open (options.filename, "w") as outfile:
-         outfile.write(json_data)
+         outfile.write(json.dumps(data))
    else:
       print json_data
