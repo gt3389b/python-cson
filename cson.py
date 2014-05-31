@@ -309,10 +309,18 @@ def toJSON(text, indent=0):
 
    return ''.join(tokens)
 
-def cson2json(csonString,indent=0):
+def csons2json(csonString,indent=0):
    return toJSON(csonString,indent)
 
-loads = cson2json
+def csons2py(csonString):
+   return json.loads(toJSON(csonString))
+
+def cson2py(filename):
+   with open (filename, "r") as infile:
+      return json.loads(toJSON(infile.readlines()))
+
+loads = csons2py
+load = cson2py
 
 if __name__ == "__main__":
    """
@@ -334,10 +342,10 @@ if __name__ == "__main__":
 
    (options, args) = parser.parse_args()
 
-   if len(args) == 0:
-      input_file = None
-   else:
+   if len(args):
       input_file = args[0]
+   else:
+      input_file = None
 
    cson_data=''
    if input_file:
@@ -347,7 +355,7 @@ if __name__ == "__main__":
       for line in sys.stdin:
          cson_data+=line
 
-   json_data=loads(''.join(cson_data))
+   json_data=csons2json(''.join(cson_data))
    if options.filename:
       with open (options.filename, "w") as outfile:
          outfile.write(json_data)
