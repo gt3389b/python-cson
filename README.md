@@ -53,7 +53,7 @@ if inputfilename:
       cson_data=infile.readlines()
 
       # interpret the CSON string
-      json_data = cson.loads(''.join(cson_data), 1)
+      json_data = cson.csons2json(''.join(cson_data), 1)
 
       # write the JSON string out to 
       print "Creating "+outFile
