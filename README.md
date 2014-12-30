@@ -23,7 +23,7 @@ easy_install python-cson
 
 ```bash
 #Commandline usage
-python-cson cson -f <outfile> <infile>
+python-cson -f <outfile> <infile>
 
 #Using STDIN
 cat <infile> | python-cson -f <outfile>
