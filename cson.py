@@ -6,7 +6,9 @@
 #
 # author: Russell Leake, http://leakerlabs.com, gt3389b@gmail.com
 # note: based on CSON-js by JongChan Choi, https://github.com/disjukr/CSON-js
-import sys,optparse, json
+import argparse
+import json
+import sys
 __all__ = ('loads', )
 
 def isName(char):
@@ -319,46 +321,28 @@ def cson2py(filename):
     with open(filename, 'r') as infile:
         return csons2py(''.join(infile.readlines()))
 
+def main():
+    """
+    Define and parse `optparse` options for command-line usage.
+    """
+    parser = argparse.ArgumentParser(description='A Python implementation of a CSON interpreter. https://pypi.python.org/pypi/python-cson')
+    parser.add_argument("-f", "--file", dest="filename", required=True, help="hash table filename", metavar="OUTPUT_FILE")
+    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=False, help="Print all warnings")
+    parser.add_argument('input_file')
+
+    args = parser.parse_args()
+
+    data = load(args.input_file)
+    if args.filename:
+        with open(args.filename, 'w') as outfile:
+            outfile.write(json.dumps(data))
+    else:
+        print json_data
+
 loads = csons2py
 load = cson2py
 
 if __name__ == "__main__":
-    """
-    Define and parse `optparse` options for command-line usage.
-    """
-    usage = """%prog [options] [INPUTFILE]
-        (STDIN is assumed if no INPUTFILE is given)"""
-    desc = "A Python implementation of a CSON interpreter. " \
-            "https://pypi.python.org/pypi/python-cson"
-    ver = "%%prog %s" % "1.0.8"
+   main()
 
-    parser = optparse.OptionParser(usage=usage, description=desc, version=ver)
-    parser.add_option("-f", "--file", dest="filename", default=None,
-            help="Write output to OUTPUT_FILE. Defaults to STDOUT.",
-            metavar="OUTPUT_FILE")
-    parser.add_option("-v", "--verbose",
-            action="store_const", const=0, dest="verbose",
-            help="Print all warnings.")
-
-    (options, args) = parser.parse_args()
-
-    if len(args):
-        input_file = args[0]
-    else:
-        input_file = None
-
-    #cson_data=''
-    #if input_file:
-    #    with open (input_file, "r") as infile:
-    #        cson_data=infile.readlines()
-    #else:
-    #    for line in sys.stdin:
-    #        cson_data+=line
-
-    #json_data=csons2json(''.join(cson_data))
-    data = load(input_file)
-    if options.filename:
-        with open(options.filename, 'w') as outfile:
-            outfile.write(json.dumps(data))
-    else:
-        print json_data
+# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4

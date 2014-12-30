@@ -12,7 +12,7 @@ def read_readme(fname):
 
 setup(
     name = "python-cson",
-    version = "1.0.8",
+    version = "1.0.9",
     url = 'https://github.com/lifthrasiir/cson',
     download_url = 'https://github.com/gt3389b/python-cson/',
     license = 'MIT',
@@ -20,6 +20,11 @@ setup(
     author = 'Russell Leake',
     author_email = 'gt3389b@gmail.com',
     py_modules = ["cson"],
+    entry_points = {
+       'console_scripts' : [
+          'python-cson = cson:main'
+         ]
+       },
     long_description = read_readme('README.md'),
     include_package_data = True,
     zip_safe = False,

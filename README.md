@@ -23,13 +23,13 @@ easy_install python-cson
 
 ```bash
 #Commandline usage
-python -m -f <outfile> <infile>
+python-cson cson -f <outfile> <infile>
 
 #Using STDIN
-cat <infile> | python -m -f <outfile>
+cat <infile> | python-cson -f <outfile>
 
 #Printing output to STDOUT
-python -m <infile>
+python-cson <infile>
 ```
 
 ```python
