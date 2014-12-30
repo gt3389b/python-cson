@@ -29,35 +29,35 @@ python -m -f <outfile> <infile>
 cat <infile> | python -m -f <outfile>
 
 #Printing output to STDOUT
-python -m <infile> 
+python -m <infile>
 ```
 
 ```python
-#! /usr/bin/python
-import cson,json,optparse,os
+#!/usr/bin/python
+import cson, json, optparse, os
 
 parser = optparse.OptionParser('Usage: %prog -i <inputfilename>')
-parser.add_option('-i', '--inputfilename', dest='inputfilename',  type='string')
+parser.add_option('-i', '--inputfilename', dest='inputfilename', type='string')
 
 (options, args) = parser.parse_args()
 
-# Assign new names to constants passed in from CLI options. 
+# Assign new names to constants passed in from CLI options.
 inputfilename  = options.inputfilename
 
 
 if inputfilename:
-   print "Processing "+inputfilename
+   print "Processing " + inputfilename
    outName = os.path.splitext(inputfilename)[0]
-   outFile = outName+".json"
-   with open (inputfilename, "r") as infile:
-      cson_data=infile.readlines()
+   outFile = outName + ".json"
+   with open(inputfilename, 'r') as infile:
+      cson_data = infile.readlines()
 
       # interpret the CSON string
       json_data = cson.csons2json(''.join(cson_data), 1)
 
-      # write the JSON string out to 
-      print "Creating "+outFile
-      with open (outFile, "w") as outfile:
+      # write the JSON string out to
+      print "Creating " + outFile
+      with open(outFile, 'w') as outfile:
          outfile.write(json_data)
 
       # decode JSON text for verfication
