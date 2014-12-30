@@ -44,25 +44,23 @@ parser.add_option('-i', '--inputfilename', dest='inputfilename', type='string')
 # Assign new names to constants passed in from CLI options.
 inputfilename  = options.inputfilename
 
-
 if inputfilename:
-   print "Processing " + inputfilename
-   outName = os.path.splitext(inputfilename)[0]
-   outFile = outName + ".json"
-   with open(inputfilename, 'r') as infile:
-      cson_data = infile.readlines()
+    print "Processing " + inputfilename
+    outName = os.path.splitext(inputfilename)[0]
+    outFile = outName + ".json"
+    with open(inputfilename, 'r') as infile:
+        cson_data = infile.readlines()
 
-      # interpret the CSON string
-      json_data = cson.csons2json(''.join(cson_data), 1)
+        # interpret the CSON string
+        json_data = cson.csons2json(''.join(cson_data), 1)
 
-      # write the JSON string out to
-      print "Creating " + outFile
-      with open(outFile, 'w') as outfile:
-         outfile.write(json_data)
+        # write the JSON string out to
+        print "Creating " + outFile
+        with open(outFile, 'w') as outfile:
+            outfile.write(json_data)
 
-      # decode JSON text for verfication
-      obj = json.loads(json_data)
-
+       # decode JSON text for verfication
+       obj = json.loads(json_data)
 else:
-   print "Requires input filename file"
+    print "Requires input filename file"
 ```
