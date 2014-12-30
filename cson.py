@@ -235,7 +235,7 @@ def toJSON(text, indent=0):
             tokens.insert(0, '{')
             tokens.append('}')
          else:
-            tokens.insert(0,'[')
+            tokens.insert(0, '[')
             tokens.append(']')
 
    i = 0
@@ -310,7 +310,7 @@ def toJSON(text, indent=0):
    return ''.join(tokens)
 
 def csons2json(csonString, indent=0):
-   return toJSON(csonString,indent)
+   return toJSON(csonString, indent)
 
 def csons2py(csonString):
    return json.loads(toJSON(csonString))
