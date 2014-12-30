@@ -330,7 +330,7 @@ if __name__ == "__main__":
         (STDIN is assumed if no INPUTFILE is given)"""
     desc = "A Python implementation of a CSON interpreter. " \
             "https://pypi.python.org/pypi/python-cson"
-    ver = "%%prog %s" % "1.0.7"
+    ver = "%%prog %s" % "1.0.8"
 
     parser = optparse.OptionParser(usage=usage, description=desc, version=ver)
     parser.add_option("-f", "--file", dest="filename", default=None,
