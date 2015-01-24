@@ -1,5 +1,6 @@
 python-cson
 ===========
+[![Build Status](https://travis-ci.org/gt3389b/python-cson.svg)](https://travis-ci.org/gt3389b/python-cson)
 
 Python library for CSON (schema-compressed JSON)
 
