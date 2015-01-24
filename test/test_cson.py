@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import unicode_literals
 import pytest, cson, json
 def compare(a, b):
    if ( a == b ):
@@ -10,20 +12,13 @@ def parseTest(input, expected, message=""):
     #message = typeof message == 'undefined' ?
     #    input : message.toUpperCase() + ':';
     if len(message):
-      print ""
-      print '\x1B[1m\x1B[33m' + message + '\x1B[22m'
+      print("")
+      print('\x1B[1m\x1B[33m' + message + '\x1B[22m')
     actual = cson.loads(input)
     if not compare(expected,actual):
        pytest.fail('\x1B[1m\x1B[31mFAILED\x1B[39m\x1B[22m', ': expected(', expected, ") actual(", actual,")")
        #pytest.fail("not configured: %s" %(x,))
-    print '\x1B[1m\x1B[32mPASS\x1B[39m\x1B[22m', ': expected(', expected, ") actual(", actual,")"
-
-def printSubject(subject):
-    print ''
-    print '*****'
-    print '\x1B[33m' + subject + '\x1B[39m'
-    print '*****'
-
+    print('\x1B[1m\x1B[32mPASS\x1B[39m\x1B[22m', ': expected(', expected, ") actual(", actual,")")
 
 #
 # Primitive Types

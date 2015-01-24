@@ -6,6 +6,8 @@
 #
 # author: Russell Leake, http://leakerlabs.com, gt3389b@gmail.com
 # note: based on CSON-js by JongChan Choi, https://github.com/disjukr/CSON-js
+from __future__ import print_function
+from __future__ import unicode_literals
 import argparse
 import json
 import sys
@@ -337,7 +339,7 @@ def main():
         with open(args.filename, 'w') as outfile:
             outfile.write(json.dumps(data))
     else:
-        print json_data
+        print(json_data)
 
 loads = csons2py
 load = cson2py
