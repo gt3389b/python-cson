@@ -8,9 +8,7 @@
 # note: based on CSON-js by JongChan Choi, https://github.com/disjukr/CSON-js
 from __future__ import print_function
 from __future__ import unicode_literals
-import argparse
-import json
-import sys
+import argparse, json, sys
 __all__ = ('loads', )
 
 def isName(char):
@@ -341,7 +339,7 @@ def findrefs(obj, refs, namespace):
         Return them as a list """
     if isinstance(obj,dict):
         for k, v in obj.items():
-            if type(v) == unicode:
+            if type(v) == str:
                 if v[:3] == "@@@": 
                     refs.append(namespace+'.'+k)
             if isinstance(v,dict):
@@ -355,7 +353,7 @@ def sortrefs(dataObj, refs):
         tempVal = getrefvalue(dataObj, i)
 
         # detect if a reference points to itself
-        if type(tempVal) == unicode:
+        if type(tempVal) == str:
             if tempVal[:3] == "@@@":
                 if '.'+tempVal[3:] == i[:len(tempVal[3:])+1]:
                     raise Exception("Recursion detected")
@@ -368,7 +366,7 @@ def sortrefs(dataObj, refs):
     while len(temp):
         found = None
         for i in temp:
-            if type(temp[i]) == unicode:
+            if type(temp[i]) == str:
                 if temp[i][:3] == "@@@":
                     continue
 
@@ -396,9 +394,38 @@ def sortrefs(dataObj, refs):
 
     return sortedRefs
 
+def _decode_list(data):
+    rv = []
+    for item in data:
+        if isinstance(item, unicode):
+            item = item.encode('utf-8')
+        elif isinstance(item, list):
+            item = _decode_list(item)
+        elif isinstance(item, dict):
+            item = _decode_dict(item)
+        rv.append(item)
+    return rv
+
+def _decode_dict(data):
+    rv = {}
+    for key, value in data.iteritems():
+        if isinstance(key, unicode):
+            key = key.encode('utf-8')
+        if isinstance(value, unicode):
+            value = value.encode('utf-8')
+        elif isinstance(value, list):
+            value = _decode_list(value)
+        elif isinstance(value, dict):
+            value = _decode_dict(value)
+        rv[key] = value
+    return rv
+
 def csons2py(csonString):
     # First convert the CSON -> JSON -> dataObj
-    dataObj = json.loads(toJSON(csonString))
+    if sys.version_info[0] < 3:
+        dataObj = json.loads(toJSON(csonString), object_hook=_decode_dict)
+    else:
+        dataObj = json.loads(toJSON(csonString))
 
     # Next, @references are converted to "@@@reference" strings.  Let's find all
     # references in the data and put them in a list
