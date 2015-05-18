@@ -76,6 +76,12 @@ def isBoolean(s):
     else:
         return False
 
+def isRef(s):
+    if len(s):
+        if s[0] == '@':
+            return True
+    return False
+
 def isNull(s):
     """ Checks to see if this is a JSON null object """
     if s == 'null':
@@ -274,6 +280,11 @@ def toJSON(text, indent=0):
                 pass
             elif isNull(tokens[i]):
                 pass
+            elif isRef(tokens[i]):
+                # Quote references and mark them with a special start sequence.  By treating them as a JSON string, it 
+                # allows us to use the JSON library to directly convert into data structures.  Then we can easily walk the data structures
+                # and reassign the values 
+                tokens[i] = '\"@@' + tokens[i] + '\"'
             else:
                 tokens[i] = '\"' + tokens[i] + '\"'
 
@@ -282,6 +293,7 @@ def toJSON(text, indent=0):
                 tokens[i] += ','
                 if indent:
                     tokens[i] += newline()
+
         i += 1
 
     if indent:
@@ -316,8 +328,98 @@ def toJSON(text, indent=0):
 def csons2json(csonString, indent=0):
     return toJSON(csonString, indent)
 
+def getrefvalue(dataObj, ref):
+    """ Derefernce a scope (e.g. .item.subitem) into a value """
+    namespace = ref.split('.')[1:]
+    keyRef = dataObj
+    for name in namespace:
+        keyRef = keyRef[name]
+    return keyRef
+
+def findrefs(obj, refs, namespace):
+    """ Find all of the @@@references in a dictionary heirarchy.
+        Return them as a list """
+    if isinstance(obj,dict):
+        for k, v in obj.items():
+            if type(v) == unicode:
+                if v[:3] == "@@@": 
+                    refs.append(namespace+'.'+k)
+            if isinstance(v,dict):
+                item = findrefs(v, refs, namespace+'.'+k)
+
+def sortrefs(dataObj, refs):
+    """ Sort the @@@reference list so that substitutions cascade """
+    temp = {}
+    sortedRefs = []
+    for i in refs:
+        tempVal = getrefvalue(dataObj, i)
+
+        # detect if a reference points to itself
+        if type(tempVal) == unicode:
+            if tempVal[:3] == "@@@":
+                if '.'+tempVal[3:] == i[:len(tempVal[3:])+1]:
+                    raise Exception("Recursion detected")
+
+        try:
+            temp[i] = getrefvalue(dataObj, '.'+tempVal[3:])
+        except KeyError:
+            raise Exception("Dead reference")
+
+    while len(temp):
+        found = None
+        for i in temp:
+            if type(temp[i]) == unicode:
+                if temp[i][:3] == "@@@":
+                    continue
+
+            found = i
+            break
+
+        # if there are no nodes that lead to an endpoint, then there is recursion
+        if not found:
+            raise Exception("Recursion detected")
+
+        # delete the entry so we don't traverse this path again
+        del(temp[found])
+        sortedRefs.append(found)
+
+        # now walk the references backwards
+        while found:
+            find = found
+            found = None
+            for i in temp:
+                if '.'+getrefvalue(dataObj, i)[3:] == find:
+                    found = i
+                    del(temp[found])
+                    sortedRefs.append(found)
+                    break
+
+    return sortedRefs
+
 def csons2py(csonString):
-    return json.loads(toJSON(csonString))
+    # First convert the CSON -> JSON -> dataObj
+    dataObj = json.loads(toJSON(csonString))
+
+    # Next, @references are converted to "@@@reference" strings.  Let's find all
+    # references in the data and put them in a list
+    refs = []
+    findrefs(dataObj, refs, '')
+
+    # Sort the references so that substitution is cascading
+    refs = sortrefs(dataObj, refs)
+
+    # Now we can walk through the list of references and assign them
+    for i in refs:
+        # split the namespace into a list so we can drill down the heirarchy
+        namespace = i.split('.')[1:]
+        keyRef = dataObj
+        for name in namespace[:-1]:
+            keyRef = keyRef[name]
+
+        # Assign the key with the referenced value
+        keyRef[namespace[-1:][0]] = getrefvalue(dataObj, '.'+keyRef[namespace[-1:][0]][3:])
+
+    return dataObj
 
 def cson2py(filename):
     with open(filename, 'r') as infile:

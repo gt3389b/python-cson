@@ -8,17 +8,9 @@ def compare(a, b):
       return False
 
 def parseTest(input, expected, message=""):
-    __tracebackhide__ = True
-    #message = typeof message == 'undefined' ?
-    #    input : message.toUpperCase() + ':';
-    if len(message):
-      print("")
-      print('\x1B[1m\x1B[33m' + message + '\x1B[22m')
     actual = cson.loads(input)
     if not compare(expected,actual):
-       pytest.fail('\x1B[1m\x1B[31mFAILED\x1B[39m\x1B[22m', ': expected(', expected, ") actual(", actual,")")
-       #pytest.fail("not configured: %s" %(x,))
-    print('\x1B[1m\x1B[32mPASS\x1B[39m\x1B[22m', ': expected(', expected, ") actual(", actual,")")
+      pytest.fail("expected("+ str(expected) + ") actual("+ str(actual) +")")
 
 #
 # Primitive Types
@@ -125,6 +117,38 @@ def test_UnquotedValuesGetQutoed():
 def test_UnquotedKeysGetQutoed():
    parseTest('e = []', json.loads('{"e": []}'), 'ensure unquoted keys get quoted');
 
+#
+# @Reference 
+#
+def test_Reference():
+   parseTest('{c: null, b: @c}', json.loads('{"c": null, "b": null}'), 'ensure reference is propogated');
+
+def test_RefEmbedded():
+   parseTest('{c: null, b: { c: @c }}', json.loads('{"c": null, "b": { "c": null } }'), 'ensure reference is propogated for deep objects');
+
+def test_RefDeepEmbedded():
+   parseTest('{c: @b.c.c, b: { c: { c: 1 }}}', json.loads('{"c": 1, "b": { "c": { "c": 1 } } }'), 'ensure reference is propogated for really deep objects');
+
+def test_DoubleRef():
+   parseTest('{a : 1, c : @a, b : { c: @c }}', json.loads('{"a":1, "c": 1, "b":{ "c" : 1}}'), 'ensure ref to ref works');
+
+def test_BackwardsRef():
+   parseTest('{a : 1, c : @b.c, b : { c: @a }}', json.loads('{"a":1, "c": 1, "b":{ "c" : 1}}'), 'ensure backwards ref works');
+
+def test_ComplexRef():
+   parseTest('{a : 1, c : @b, b : { c: @a }}', json.loads('{"a":1, "c": { "c" : 1 }, "b":{ "c" : 1}}'), 'ensure complex ref works');
+
+def test_DeadRef():
+   with pytest.raises(Exception):
+      cson.loads('{c: @k}')
+
+def test_RefRecurseSelf():
+   with pytest.raises(Exception):
+      cson.loads('{c: null, b: { c: @b }}')
+
+def test_RefRecurse():
+   with pytest.raises(Exception):
+      cson.loads('{c: @b, b: @c}')
 
 #
 # Complex
