@@ -2,6 +2,8 @@ python-cson
 ===========
 [![Build Status](https://travis-ci.org/gt3389b/python-cson.svg)](https://travis-ci.org/gt3389b/python-cson)
 
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/gt3389b/python-cson?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Python library for CSON (schema-compressed JSON)
 
 
