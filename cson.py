@@ -334,6 +334,18 @@ def getrefvalue(dataObj, ref):
         keyRef = keyRef[name]
     return keyRef
 
+def setrefvalue(dataObj, ref, value):
+    """ Derefernce a scope (e.g. .item.subitem) into a value """
+    namespace = ref.split('.')[1:]
+    keyRef = dataObj
+    for name in namespace[:-1]:
+        keyRef = keyRef[name]
+
+    try:
+        keyRef[namespace[-1:][0]] = value
+    except KeyError:
+        raise Exception("Dead reference")
+
 def findrefs(obj, refs, namespace):
     """ Find all of the @@@references in a dictionary heirarchy.
         Return them as a list """
@@ -345,56 +357,37 @@ def findrefs(obj, refs, namespace):
             if isinstance(v,dict):
                 item = findrefs(v, refs, namespace+'.'+k)
 
-def sortrefs(dataObj, refs):
-    """ Sort the @@@reference list so that substitutions cascade """
-    temp = {}
-    sortedRefs = []
-    for i in refs:
-        tempVal = getrefvalue(dataObj, i)
-
-        # detect if a reference points to itself
-        if type(tempVal) == str:
-            if tempVal[:3] == "@@@":
-                if '.'+tempVal[3:] == i[:len(tempVal[3:])+1]:
-                    raise Exception("Recursion detected")
-
-        try:
-            temp[i] = getrefvalue(dataObj, '.'+tempVal[3:])
-        except KeyError:
-            raise Exception("Dead reference")
-
-    while len(temp):
+def resolveRefs(dataObj, refs):
+    """ Resolve the @@@reference list """
+    while len(refs):
         found = None
-        for i in temp:
-            if type(temp[i]) == str:
-                if temp[i][:3] == "@@@":
-                    continue
+        for i in refs:
+            # Get reference
+            dataRef = getrefvalue(dataObj, i)
+
+            # Check if the refernce points to a parent scope (b.c -> b)
+            if type(dataRef) == str:
+                if dataRef[:3] == "@@@":
+                    if '.'+dataRef[3:] == i[:len(dataRef[3:])+1]:
+                        raise Exception("Recursion detected")
+
+            refVal = getrefvalue(dataObj, '.'+dataRef[3:])
+
+            if "@@@" in json.dumps(refVal):
+                continue
 
             found = i
             break
 
-        # if there are no nodes that lead to an endpoint, then there is recursion
-        if not found:
+        if found:
+            setrefvalue(dataObj, found, refVal)
+            refs.remove(found)
+        else:
+            # this means there was only references to references
             raise Exception("Recursion detected")
 
-        # delete the entry so we don't traverse this path again
-        del(temp[found])
-        sortedRefs.append(found)
-
-        # now walk the references backwards
-        while found:
-            find = found
-            found = None
-            for i in temp:
-                if '.'+getrefvalue(dataObj, i)[3:] == find:
-                    found = i
-                    del(temp[found])
-                    sortedRefs.append(found)
-                    break
-
-    return sortedRefs
-
 def _decode_list(data):
+    """ Only used for Python2.X """
     rv = []
     for item in data:
         if isinstance(item, unicode):
@@ -407,6 +400,7 @@ def _decode_list(data):
     return rv
 
 def _decode_dict(data):
+    """ Only used for Python2.X """
     rv = {}
     for key, value in data.iteritems():
         if isinstance(key, unicode):
@@ -433,18 +427,7 @@ def csons2py(csonString):
     findrefs(dataObj, refs, '')
 
     # Sort the references so that substitution is cascading
-    refs = sortrefs(dataObj, refs)
-
-    # Now we can walk through the list of references and assign them
-    for i in refs:
-        # split the namespace into a list so we can drill down the heirarchy
-        namespace = i.split('.')[1:]
-        keyRef = dataObj
-        for name in namespace[:-1]:
-            keyRef = keyRef[name]
-
-        # Assign the key with the referenced value
-        keyRef[namespace[-1:][0]] = getrefvalue(dataObj, '.'+keyRef[namespace[-1:][0]][3:])
+    refs = resolveRefs(dataObj, refs)
 
     return dataObj
 
