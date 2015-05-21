@@ -9,7 +9,7 @@ def compare(a, b):
 
 def parseTest(input, expected, message=""):
     actual = cson.loads(input)
-    if not compare(expected,actual):
+    if not compare(json.dumps(expected),json.dumps(actual)):
       pytest.fail("expected("+ str(expected) + ") actual("+ str(actual) +")")
 
 #
@@ -137,6 +137,15 @@ def test_BackwardsRef():
 
 def test_ComplexRef():
    parseTest('{a : 1, c : @b, b : { c: @a }}', json.loads('{"a":1, "c": { "c" : 1 }, "b":{ "c" : 1}}'), 'ensure complex ref works');
+
+def test_DeepCopyRef():
+   # test that a reference is a copy of the data and not a python pointer to the original
+   input = '{a : 1, c : @b, b : { c: @a }}'
+   expected = json.loads('{"a":1, "c": { "c" : 2 }, "b":{ "c" : 1}}')
+   actual = cson.loads(input)
+   actual['c']['c']=2
+   if not compare(json.dumps(expected),json.dumps(actual)):
+      pytest.fail("expected("+ str(expected) + ") actual("+ str(actual) +")")
 
 def test_DeadRef():
    with pytest.raises(Exception):

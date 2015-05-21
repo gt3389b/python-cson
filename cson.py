@@ -8,7 +8,7 @@
 # note: based on CSON-js by JongChan Choi, https://github.com/disjukr/CSON-js
 from __future__ import print_function
 from __future__ import unicode_literals
-import argparse, json, sys
+import argparse, copy, json, sys
 __all__ = ('loads', )
 
 def isName(char):
@@ -380,7 +380,7 @@ def resolveRefs(dataObj, refs):
             break
 
         if found:
-            setrefvalue(dataObj, found, refVal)
+            setrefvalue(dataObj, found, copy.deepcopy(refVal))
             refs.remove(found)
         else:
             # this means there was only references to references
