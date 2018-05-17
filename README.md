@@ -14,7 +14,7 @@ Authors
 Source
 ------
 * Documentation: <https://github.com/lifthrasiir/cson>
-* Python Package Index: <http://pypi.python.org/pypi/cson>
+* Python Package Index: <http://pypi.python.org/pypi/python-cson>
 * GitHub: <https://github.com/gt3389b/python-cson>
 
 ##Install
